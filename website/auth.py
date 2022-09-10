@@ -6,7 +6,7 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
 def login():
-    return render_template("login.html")
+    return render_template("login.html", text="Testing", user="Tim", boolean=True)
 
 @auth.route('/logout')
 def logout():
