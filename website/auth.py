@@ -6,6 +6,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
 # for security reason, we use werkzeug for password hashing
 from werkzeug.security import generate_password_hash, check_password_hash
+from . import db
 
 
 auth = Blueprint('auth', __name__)
@@ -27,14 +28,14 @@ def sign_up():
     # Taking the information
     if request.method == 'POST':
         email = request.form.get('email')
-        firstName = request.form.get('firstName')
+        first_name = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
         #Creating feedback on user for their registration
         if len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
-        elif len(firstName) < 2:
+        elif len(first_name) < 2:
             pasflash('First name must be greater than 1 characters.', category='error')
         elif password1 != password2:
             flash('Password don\'t match.', category='error')
@@ -42,7 +43,7 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             # Now we create the user
-            new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='sha256'))
+            new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
             flash('Your account has been created!', category='success')
