@@ -24,11 +24,13 @@ def create_app():
 
     # just importing the models
     from .models import User, Note
+    #run the create_database function below
+    create_database(app)
 
     return app
 
 #check if the database has existed or not
 def create_database(app):
-    if not path('website/' + DB_NAME):
+    if not path.exists('website/' + DB_NAME):
         db.create_all(app=app)
         print('Created Database!')
