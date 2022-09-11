@@ -2,7 +2,11 @@
 # it means thsi file has the blueprint of our app
 # Request is for allowing the http request
 # flash is to flash message to user by flask
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from .models import User
+# for security reason, we use werkzeug for password hashing
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 auth = Blueprint('auth', __name__)
 
@@ -37,6 +41,13 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
+            # Now we create the user
+            new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='sha256'))
+            db.session.add(new_user)
+            db.session.commit()
             flash('Your account has been created!', category='success')
+            # Then redirect the user to the homepage of the website
+            # why i put the url_for is if you changed the root it still works. views is the blueprint name 
+            return redirect(url_for('views.home'))
 
     return render_template("sign_up.html")
