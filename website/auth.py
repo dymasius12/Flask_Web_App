@@ -34,7 +34,8 @@ def login():
                 flash('incorrect password, try again.', category='error')
         else:
             flash('email does not exist!', category='error')
-    return render_template("login.html", text="Testing", user="Tim", boolean=True)
+
+    return render_template("login.html", user=current_user)
 
 @auth.route('/logout')
 # what is the below decorator means: user need to login.
@@ -76,4 +77,4 @@ def sign_up():
             # why i put the url_for is if you changed the root it still works. views is the blueprint name 
             return redirect(url_for('views.home'))
 
-    return render_template("sign_up.html")
+    return render_template("sign_up.html", user=current_user)
