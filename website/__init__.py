@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
+from flask_login import LoginManager
 
 # create the database
 db = SQLAlchemy()
@@ -15,6 +16,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
+   
     #registering the views root
     from .views import views
     from .auth import auth
@@ -27,6 +29,16 @@ def create_app():
     #run the create_database function below
     create_database(app)
 
+    # Use the login manager to tell if you have not login where to redirect?
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.init_app(app)
+
+    # This is just telling flask how we load a user. same as filtered by but instead use primary key.
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
+    
     return app
 
 #check if the database has existed or not

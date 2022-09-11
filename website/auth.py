@@ -7,6 +7,7 @@ from .models import User
 # for security reason, we use werkzeug for password hashing
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
+from flask_login import login_user, login_required, logout_user, current_user
 
 
 auth = Blueprint('auth', __name__)
@@ -26,6 +27,9 @@ def login():
         if user:
             if check_password_hash(user.password, password):
                 flash('logged in successfully!', category='success')
+                # user the flask_login and use the login_user remember the user means it knows this user has already login 
+                login_user(user, remember=True)
+                return redirect(url_for('views.home'))
             else:
                 flash('incorrect password, try again.', category='error')
         else:
@@ -33,8 +37,11 @@ def login():
     return render_template("login.html", text="Testing", user="Tim", boolean=True)
 
 @auth.route('/logout')
+# what is the below decorator means: user need to login.
+@login_required
 def logout():
-    return "<p>logout<p>"
+    logout_user()
+    return redirect(url_for('auth.login'))
 
 @auth.route('/sign-up', methods=['Get', 'POST'])
 def sign_up():
@@ -63,6 +70,7 @@ def sign_up():
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
+            login_user(user, remember=True)
             flash('Your account has been created!', category='success')
             # Then redirect the user to the homepage of the website
             # why i put the url_for is if you changed the root it still works. views is the blueprint name 
