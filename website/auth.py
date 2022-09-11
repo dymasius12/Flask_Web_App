@@ -17,6 +17,19 @@ def login():
     # Getting the form data
     # data = request.form
     # print(data)
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # Check whether it is the correct value
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                flash('logged in successfully!', category='success')
+            else:
+                flash('incorrect password, try again.', category='error')
+        else:
+            flash('email does not exist!', category='error')
     return render_template("login.html", text="Testing", user="Tim", boolean=True)
 
 @auth.route('/logout')
@@ -32,8 +45,12 @@ def sign_up():
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            flash('Email already exist!', category='error')
         #Creating feedback on user for their registration
-        if len(email) < 4:
+        elif len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
         elif len(first_name) < 2:
             pasflash('First name must be greater than 1 characters.', category='error')
